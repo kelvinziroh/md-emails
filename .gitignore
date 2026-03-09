@@ -11,6 +11,8 @@ wheels/
 
 # configuration files
 .env
+credentials.json
+token.json
 
 # Experiments
 notebooks
