@@ -9,25 +9,20 @@ from googleapiclient.errors import HttpError
 
 
 def list_drafts(service):
-    drafts_obj = service.users().drafts().list(userId="me").execute()
-    return drafts_obj["drafts"]
-
-
-def create_draft(service):
     try:
-        message = EmailMessage()
-        message.set_content("This is an automated draft email")
+        drafts_obj = service.users().drafts().list(userId="me").execute()
+        drafts = drafts_obj["drafts"]
+        # service.users().messages.get(userId="me", format="metadata")
+    except HttpError as err:
+        print(f"An error occured: {err}")
+        drafts = None
+    return drafts
 
-        message["To"] = "zirodev8687+person1@gmail.com"
-        message["From"] = "zirodev8687@gmail.com"
-        message["Subject"] = "Automated draft"
 
-        # encode message
-        encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
-        create_message = {"message": {"raw": encoded_message}}
-        draft = (
-            service.users().drafts().create(userId="me", body=create_message).execute()
-        )
+def create_draft(service, content):
+    try:
+        message = create_message(content)
+        draft = service.users().drafts().create(userId="me", body=message).execute()
 
         print(f"Draft id: {draft['id']}\nDraft message: {draft['message']}")
     except HttpError as err:
@@ -35,6 +30,19 @@ def create_draft(service):
         draft = None
 
     return draft
+
+
+def create_message(content):
+    message = EmailMessage()
+    message.set_content(content)
+
+    message["To"] = "zirodev8687+person1@gmail.com"
+    message["From"] = "zirodev8687@gmail.com"
+    message["Subject"] = "Automated draft"
+
+    # encode message
+    encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
+    return {"message": {"raw": encoded_message}}
 
 
 def get_creds(scopes):
