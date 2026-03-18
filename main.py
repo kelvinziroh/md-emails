@@ -15,15 +15,17 @@ def main():
     #     print(f"*{i + 1}->{draft}")
     draft_objs = drafts.list_drafts(service)
 
+    draft_items = []
     if draft_objs:
         for obj in draft_objs:
-            draft_id = obj["id"]
-            msg_id = obj["message"]["id"]
-            thread_id = obj["message"]["threadId"]
+            draft_item = {}
+            draft_item["draft_id"] = obj["id"]
+            draft_item["message_id"] = obj["message"]["id"]
+            draft_item["thread_id"] = obj["message"]["threadId"]
             headers = (
                 service.users()
                 .messages()
-                .get(userId="me", id=msg_id, format="metadata")
+                .get(userId="me", id=draft_item["message_id"], format="metadata")
                 .execute()
             )["payload"]["headers"]
 
@@ -32,13 +34,22 @@ def main():
                 header for header in headers if header["name"] in header_filters
             ]
 
-            print(
-                f"Draft id: {draft_id}\nMessage id: {msg_id}\nThread id: {thread_id}\n\nHeaders:\n"
-            )
-            for header in filtered_headers:
-                print(header)
-            print("\n")
+            draft_item["date"] = [
+                header["value"] for header in headers if header["name"] == "Date"
+            ][0]
+            draft_item["subject"] = [
+                header["value"] for header in headers if header["name"] == "Subject"
+            ][0]
+            draft_item["to"] = [
+                header["value"] for header in headers if header["name"] == "To"
+            ][0]
+            draft_item["from"] = [
+                header["value"] for header in headers if header["name"] == "From"
+            ][0]
 
+            draft_items.append(draft_item)
+
+    print(draft_items)
     # print(pprint.pformat(draft, indent=4, sort_dicts=True))
 
 
