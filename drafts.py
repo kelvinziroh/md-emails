@@ -10,13 +10,45 @@ from googleapiclient.errors import HttpError
 
 def list_drafts(service):
     try:
-        drafts_obj = service.users().drafts().list(userId="me").execute()
-        drafts = drafts_obj["drafts"]
-        # service.users().messages.get(userId="me", format="metadata")
+        drafts_obj = service.users().drafts().list(userId="me").execute()["drafts"]
+
+        drafts = []
+        for obj in drafts_obj:
+            headers = filter_headers(service, obj["message"]["id"])
+            draft = create_ddict(obj, headers)
+            drafts.append(draft)
     except HttpError as err:
         print(f"An error occured: {err}")
         drafts = None
+
     return drafts
+
+
+def create_ddict(draft_obj, headers):
+    draft_dict = {}
+    draft_dict["draft_id"] = draft_obj["id"]
+    draft_dict["message_id"] = draft_obj["message"]["id"]
+    draft_dict["thread_id"] = draft_obj["message"]["threadId"]
+    draft_dict["date"] = get_header_value(headers, "Date")
+    draft_dict["subject"] = get_header_value(headers, "Subject")
+    draft_dict["to"] = get_header_value(headers, "To")
+    draft_dict["from"] = get_header_value(headers, "From")
+    return draft_dict
+
+
+def get_header_value(headers, header_name):
+    return [header["value"] for header in headers if header["name"] == header_name][0]
+
+
+def filter_headers(service, message_id):
+    headers = (
+        service.users()
+        .messages()
+        .get(userId="me", id=message_id, format="metadata")
+        .execute()["payload"]["headers"]
+    )
+    filters = ["Date", "Subject", "To", "From"]
+    return [header for header in headers if header["name"] in filters]
 
 
 def create_draft(service, content):
