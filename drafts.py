@@ -8,6 +8,16 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.errors import HttpError
 
 
+def send_draft(service, draft_id):
+    try:
+        result = (
+            service.users().drafts().send(userId="me", body={"id": draft_id}).execute()
+        )
+        print(f"Draft sent successfully. Message ID {result['id']}")
+    except HttpError as err:
+        print(f"An error occurred: {err}")
+
+
 def delete_draft(service, draft_id):
     try:
         service.users().drafts().delete(userId="me", id=draft_id).execute()

@@ -37,6 +37,11 @@ def main():
         else:
             print(f"Deletion of draft ID {id} cancelled successfully")
 
+    # send draft
+    if "--send" in sys.argv or "-s" in sys.argv:
+        id = input("Enter draft ID: ").strip()
+        drafts.send_draft(service, id)
+
 
 def print_list(items):
     for item in items:
