@@ -8,6 +8,23 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.errors import HttpError
 
 
+def update_draft(service, draft_id):
+    try:
+        message = create_message()
+        draft = (
+            service.users()
+            .drafts()
+            .update(userId="me", id=draft_id, body=message)
+            .execute()
+        )
+        print(f"Draft id: {draft['id']}\nDraft message: {draft['message']}")
+    except HttpError as err:
+        print(f"An error occured: {err}")
+        draft = None
+
+    return draft
+
+
 def list_drafts(service):
     try:
         drafts_obj = service.users().drafts().list(userId="me").execute()["drafts"]
@@ -51,9 +68,9 @@ def filter_headers(service, message_id):
     return [header for header in headers if header["name"] in filters]
 
 
-def create_draft(service, content):
+def create_draft(service):
     try:
-        message = create_message(content)
+        message = create_message()
         draft = service.users().drafts().create(userId="me", body=message).execute()
 
         print(f"Draft id: {draft['id']}\nDraft message: {draft['message']}")
@@ -64,13 +81,12 @@ def create_draft(service, content):
     return draft
 
 
-def create_message(content):
+def create_message():
     message = EmailMessage()
-    message.set_content(content)
-
-    message["To"] = "zirodev8687+person1@gmail.com"
     message["From"] = "zirodev8687@gmail.com"
-    message["Subject"] = "Automated draft"
+    message["To"] = input("Recipient: ").strip()
+    message["Subject"] = input("Subject: ").strip()
+    message.set_content(input("Enter message:\n>").strip())
 
     # encode message
     encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
