@@ -31,6 +31,14 @@ def main():
         id = input("Enter draft ID: ").strip()
         drafts.update_draft(service, id)
 
+    if "--del" in sys.argv or "-D" in sys.argv:
+        id = input("Enter draft ID: ").strip()
+        confirmation = input(f"Confirm deletion of draft ID {id}: [Y/n] ")
+        if confirmation.lower() == "y":
+            drafts.delete_draft(service, id)
+        else:
+            print(f"Deletion of draft ID {id} cancelled successfully")
+
 
 if __name__ == "__main__":
     main()

@@ -8,6 +8,14 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.errors import HttpError
 
 
+def delete_draft(service, draft_id):
+    try:
+        service.users().drafts().delete(userId="me", id=draft_id).execute()
+        print(f"Draft '{draft_id}' deleted successfully.")
+    except HttpError as err:
+        print(f"An error occured: {err}")
+
+
 def update_draft(service, draft_id):
     try:
         message = create_message()
@@ -41,16 +49,16 @@ def list_drafts(service):
     return drafts
 
 
-def create_ddict(draft_obj, headers):
-    draft_dict = {}
-    draft_dict["draft_id"] = draft_obj["id"]
-    draft_dict["message_id"] = draft_obj["message"]["id"]
-    draft_dict["thread_id"] = draft_obj["message"]["threadId"]
-    draft_dict["date"] = get_header_value(headers, "Date")
-    draft_dict["subject"] = get_header_value(headers, "Subject")
-    draft_dict["to"] = get_header_value(headers, "To")
-    draft_dict["from"] = get_header_value(headers, "From")
-    return draft_dict
+def create_ddict(obj, headers):
+    ddict = {}
+    ddict["draft_id"] = obj["id"]
+    ddict["message_id"] = obj["message"]["id"]
+    ddict["thread_id"] = obj["message"]["threadId"]
+    ddict["date"] = get_header_value(headers, "Date")
+    ddict["subject"] = get_header_value(headers, "Subject")
+    ddict["to"] = get_header_value(headers, "To")
+    ddict["from"] = get_header_value(headers, "From")
+    return ddict
 
 
 def get_header_value(headers, header_name):
