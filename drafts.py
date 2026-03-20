@@ -11,7 +11,7 @@ from googleapiclient.errors import HttpError
 def delete_draft(service, draft_id):
     try:
         service.users().drafts().delete(userId="me", id=draft_id).execute()
-        print(f"Draft '{draft_id}' deleted successfully.")
+        print(f"Draft ID '{draft_id}' deleted successfully.")
     except HttpError as err:
         print(f"An error occured: {err}")
 
