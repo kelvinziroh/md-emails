@@ -26,9 +26,9 @@ def delete_draft(service, draft_id):
         print(f"An error occured: {err}")
 
 
-def update_draft(service, draft_id):
+def update_draft(service, draft_id, content):
     try:
-        message = create_message()
+        message = create_message(content)
         draft = (
             service.users()
             .drafts()
@@ -86,9 +86,9 @@ def filter_headers(service, message_id):
     return [header for header in headers if header["name"] in filters]
 
 
-def create_draft(service):
+def create_draft(service, content):
     try:
-        message = create_message()
+        message = create_message(content)
         draft = service.users().drafts().create(userId="me", body=message).execute()
 
         print(f"Draft id: {draft['id']}\nDraft message: {draft['message']}")
@@ -99,12 +99,12 @@ def create_draft(service):
     return draft
 
 
-def create_message():
+def create_message(content):
     message = EmailMessage()
     message["From"] = "zirodev8687@gmail.com"
     message["To"] = input("Recipient: ").strip()
     message["Subject"] = input("Subject: ").strip()
-    message.set_content(input("Enter message:\n>").strip())
+    message.set_content(content)
 
     # encode message
     encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
