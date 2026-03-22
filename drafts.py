@@ -26,9 +26,9 @@ def delete_draft(service, draft_id):
         print(f"An error occured: {err}")
 
 
-def update_draft(service, draft_id, content):
+def update_draft(service, draft_id, recipients, content):
     try:
-        message = create_message(content)
+        message = create_message(recipients, content)
         draft = (
             service.users()
             .drafts()
@@ -67,6 +67,8 @@ def create_ddict(obj, headers):
     ddict["date"] = get_header_value(headers, "Date")
     ddict["subject"] = get_header_value(headers, "Subject")
     ddict["to"] = get_header_value(headers, "To")
+    ddict["cc"] = get_header_value(headers, "Cc")
+    ddict["bcc"] = get_header_value(headers, "Bcc")
     ddict["from"] = get_header_value(headers, "From")
     return ddict
 
@@ -82,13 +84,13 @@ def filter_headers(service, message_id):
         .get(userId="me", id=message_id, format="metadata")
         .execute()["payload"]["headers"]
     )
-    filters = ["Date", "Subject", "To", "From"]
+    filters = ["Date", "Subject", "To", "Cc", "Bcc", "From"]
     return [header for header in headers if header["name"] in filters]
 
 
-def create_draft(service, content):
+def create_draft(service, recipients, content):
     try:
-        message = create_message(content)
+        message = create_message(recipients, content)
         draft = service.users().drafts().create(userId="me", body=message).execute()
 
         print(f"Draft id: {draft['id']}\nDraft message: {draft['message']}")
@@ -99,10 +101,16 @@ def create_draft(service, content):
     return draft
 
 
-def create_message(content):
+def create_message(recipients, content):
     message = EmailMessage()
     message["From"] = "zirodev8687@gmail.com"
-    message["To"] = input("Recipient: ").strip()
+    message["To"] = ", ".join(recipients["primary"]).rstrip(", ")
+    message["Cc"] = (
+        ", ".join(recipients["cc"]).rstrip(", ") if "cc" in recipients else None
+    )
+    message["Bcc"] = (
+        ", ".join(recipients["bcc"]).rstrip(", ") if "bcc" in recipients else None
+    )
     message["Subject"] = input("Subject: ").strip()
     message.set_content(content)
 

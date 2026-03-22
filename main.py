@@ -5,6 +5,7 @@ from pathlib import Path
 from googleapiclient.discovery import build
 
 import drafts
+from recipients import get_recipients
 
 
 def main():
@@ -23,16 +24,17 @@ def main():
 
     # create draft
     if "--create" in sys.argv or "-c" in sys.argv:
+        recipients = get_recipients(cc=True, bcc=True)
         if p.exists():
             content = p.read_text()
-            drafts.create_draft(service, content)
+            drafts.create_draft(service, recipients, content)
 
     # update draft
     if "--edit" in sys.argv or "-e" in sys.argv:
         id = input("Enter draft ID: ").strip()
         if p.exists():
             content = p.read_text()
-            drafts.update_draft(service, id, content)
+            # drafts.update_draft(service, id, content)
 
     # delete draft
     if "--del" in sys.argv or "-D" in sys.argv:

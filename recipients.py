@@ -24,8 +24,3 @@ def get_addresses():
         addresses.append(address)
 
     return addresses
-
-
-recipients = get_recipients(cc=True)
-
-print(recipients)
