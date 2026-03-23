@@ -32,9 +32,10 @@ def main():
     # update draft
     if "--edit" in sys.argv or "-e" in sys.argv:
         id = input("Enter draft ID: ").strip()
+        recipients = get_recipients(cc=True, bcc=True)
         if html_doc.exists():
-            content = html_doc.read_text()
-            # drafts.update_draft(service, id, content)
+            html = html_doc.read_text()
+            drafts.update_draft(service, id, recipients, html, None)
 
     # delete draft
     if "--del" in sys.argv or "-D" in sys.argv:
