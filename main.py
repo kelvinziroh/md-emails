@@ -12,7 +12,7 @@ def main():
     SCOPES = ["https://www.googleapis.com/auth/gmail.modify"]
     creds = drafts.get_creds(SCOPES)
     service = build("gmail", "v1", credentials=creds)
-    p = Path("content/new_draft.txt")
+    html_doc = Path("content/index.html")
 
     # list drafts (default)
     if len(sys.argv) < 2 or "--list" in sys.argv or "-l" in sys.argv:
@@ -25,15 +25,15 @@ def main():
     # create draft
     if "--create" in sys.argv or "-c" in sys.argv:
         recipients = get_recipients(cc=True, bcc=True)
-        if p.exists():
-            content = p.read_text()
-            drafts.create_draft(service, recipients, content)
+        if html_doc.exists():
+            html = html_doc.read_text()
+            drafts.create_draft(service, recipients, html, None)
 
     # update draft
     if "--edit" in sys.argv or "-e" in sys.argv:
         id = input("Enter draft ID: ").strip()
-        if p.exists():
-            content = p.read_text()
+        if html_doc.exists():
+            content = html_doc.read_text()
             # drafts.update_draft(service, id, content)
 
     # delete draft

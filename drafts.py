@@ -1,6 +1,7 @@
 import base64
 import os.path
-from email.message import EmailMessage
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -26,9 +27,9 @@ def delete_draft(service, draft_id):
         print(f"An error occured: {err}")
 
 
-def update_draft(service, draft_id, recipients, content):
+def update_draft(service, draft_id, recipients, html, plain):
     try:
-        message = create_message(recipients, content)
+        message = create_message(recipients, html, plain)
         draft = (
             service.users()
             .drafts()
@@ -88,9 +89,9 @@ def filter_headers(service, message_id):
     return [header for header in headers if header["name"] in filters]
 
 
-def create_draft(service, recipients, content):
+def create_draft(service, recipients, html, plain):
     try:
-        message = create_message(recipients, content)
+        message = create_message(recipients, html, plain)
         draft = service.users().drafts().create(userId="me", body=message).execute()
 
         print(f"Draft id: {draft['id']}\nDraft message: {draft['message']}")
@@ -101,21 +102,25 @@ def create_draft(service, recipients, content):
     return draft
 
 
-def create_message(recipients, content):
-    message = EmailMessage()
-    message["From"] = "zirodev8687@gmail.com"
-    message["To"] = ", ".join(recipients["primary"]).rstrip(", ")
-    message["Cc"] = (
-        ", ".join(recipients["cc"]).rstrip(", ") if "cc" in recipients else None
+def create_message(recipients, html, plain=None):
+    msg = MIMEMultipart("alternative")
+    msg["From"] = "zirodev8687@gmail.com"
+    msg["To"] = ", ".join(recipients["primary"]).rstrip(", ")
+    msg["Cc"] = ", ".join(recipients["cc"]).rstrip(", ") if "cc" in recipients else ""
+    msg["Bcc"] = (
+        ", ".join(recipients["bcc"]).rstrip(", ") if "bcc" in recipients else ""
     )
-    message["Bcc"] = (
-        ", ".join(recipients["bcc"]).rstrip(", ") if "bcc" in recipients else None
-    )
-    message["Subject"] = input("Subject: ").strip()
-    message.set_content(content)
+    msg["Subject"] = input("Subject: ").strip()
+
+    if plain:
+        msg.attach(MIMEText(plain, "plain"))
+    msg.attach(MIMEText(html, "html"))
+    # message.set_content(content)
 
     # encode message
-    encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
+    encoded_message = base64.urlsafe_b64encode(msg.as_string().encode("UTF-8")).decode(
+        "UTF-8"
+    )
     return {"message": {"raw": encoded_message}}
 
 
