@@ -36,12 +36,16 @@ def main():
             drafts.create_draft(service, recipients, html, None)
 
     # update draft
-    # if "--edit" in sys.argv or "-e" in sys.argv:
-    #     id = input("Enter draft ID: ").strip()
-    #     recipients = get_recipients(cc=True, bcc=True)
-    #     if md_doc.exists():
-    #         html = src.generate_page(md_doc, template)
-    #         drafts.update_draft(service, id, recipients, html, None)
+    if "--edit" in sys.argv or "-e" in sys.argv:
+        id = input("Enter draft ID: ").strip()
+        recipients = get_recipients(cc=True, bcc=True)
+        if content.exists():
+            print("\nMessage files")
+            for md_file in content.iterdir():
+                print(f"* {md_file}")
+            md_doc = input("\nEnter message file: ").strip()
+            html = src.generate_page(md_doc, template)
+            drafts.update_draft(service, id, recipients, html, None)
 
     # delete draft
     if "--del" in sys.argv or "-D" in sys.argv:
