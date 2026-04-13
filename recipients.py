@@ -56,3 +56,10 @@ def peek_vars(data):
         print(key)
 
     print(f"\n{len(data[0].keys())} total variables")
+
+
+def read_data(file_path):
+    with open(file_path, "r") as file:
+        data = json.load(file)
+
+    return data
