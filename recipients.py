@@ -49,3 +49,10 @@ def peek_data(data, all):
             print(record["email_address"])
 
     print(f"\n{len(data)} total recipients")
+
+
+def peek_vars(data):
+    for key in data[0].keys():
+        print(key)
+
+    print(f"\n{len(data[0].keys())} total variables")
