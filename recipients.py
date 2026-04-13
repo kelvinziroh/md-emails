@@ -63,3 +63,18 @@ def read_data(file_path):
         data = json.load(file)
 
     return data
+
+
+def get_file_path():
+    recipients = Path("data/recipients")
+    print("recipient files:")
+    for fname in recipients.iterdir():
+        print(fname)
+    while True:
+        file_name = input("\nEnter file name: ")
+        file_path = Path(f"data/recipients/{file_name}")
+
+        if file_path.exists():
+            break
+
+    return f"{file_path}"
