@@ -68,28 +68,28 @@ def print_list(items):
 def create(service, content, template):
     # recipients = recipients.get_recipients(cc=True, bcc=True)
     recipients_ = recipients.get_recipients()
-    if content.exists():
-        print("\nMessage files")
-        for md_file in content.iterdir():
-            print(f"* {md_file}")
-        md_doc = input("\nEnter message file: ").strip()
-        html = src.generate_page(md_doc, template)
-        # drafts.create_draft(service, recipients, html, None)
-        drafts.create_draft(service, recipients_, html, None)
+    html = parse_md(content, template)
+    # drafts.create_draft(service, recipients, html, None)
+    drafts.create_draft(service, recipients_, html, None)
 
 
 def edit(service, content, template):
     id = input("Enter draft ID: ").strip()
     # recipients_ = recipients.get_recipients(cc=True, bcc=True)
     recipients_ = recipients.get_recipients()
+    html = parse_md(content, template)
+    # drafts.update_draft(service, id, recipients, html, None)
+    drafts.update_draft(service, id, recipients_, html, None)
+
+
+def parse_md(content, template):
     if content.exists():
         print("\nMessage files")
         for md_file in content.iterdir():
             print(f"* {md_file}")
         md_doc = input("\nEnter message file: ").strip()
         html = src.generate_page(md_doc, template)
-        # drafts.update_draft(service, id, recipients, html, None)
-        drafts.update_draft(service, id, recipients_, html, None)
+        return html
 
 
 def delete(service):
