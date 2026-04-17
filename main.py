@@ -38,15 +38,15 @@ def main():
         r_data = recipients.read_data(r_file_path)
         while True:
             view = int(
-                input("\nSelect one:\n1. Variables\n2. Records\n[e.g. 1 or 2]->")
+                input(
+                    "\nSelect one:\n1. Variables\n2. Records\n[e.g. 1 or 2]->"
+                ).strip()
             )
             if view == 1:
-                print("\nVariables")
                 recipients.peek_vars(r_data)
                 break
             if view == 2:
-                print("\nRecords")
-                recipients.peek_data(r_data, False)
+                recipients.peek_data(r_data)
                 break
 
 
