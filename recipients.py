@@ -2,6 +2,8 @@ import json
 import sys
 from pathlib import Path
 
+import pandas as pd
+
 
 def get_recipients():
     manual = prompt_entry_type()
@@ -15,8 +17,8 @@ def get_recipients():
 
     return {
         "primary": collect_group("Primary", manual, data_import, email_var),
-        "cc": collect_group("cc", manual, data_import, email_var),
-        "bcc": collect_group("bcc", manual, data_import, email_var),
+        "cc": collect_group("Cc", manual, data_import, email_var),
+        "bcc": collect_group("Bcc", manual, data_import, email_var),
     }
 
 
@@ -85,16 +87,17 @@ def peek_data(data):
 
 
 def peek_vars(data):
-    print("\nVariables")
-    for key in data[0].keys():
-        print(key)
-    print(f"\n{len(data[0].keys())} total variables")
+    vars = list(data.columns)
+    print("\n   Variable\t\tUnique values count")
+    for i, var in enumerate(vars):
+        unique_count = len(data[var].unique())
+        print(f"{i + 1}. {var}\t\t{unique_count}")
+    print(f"\n{data.shape[1]} total variables")
+    print(f"{data.shape[0]} total records")
 
 
 def read_data(file_path):
-    with open(file_path, "r") as file:
-        data = json.load(file)
-
+    data = pd.read_json(file_path)
     return data
 
 
