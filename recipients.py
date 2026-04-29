@@ -69,21 +69,13 @@ def extract_emails(data_import, email_var):
 
 def peek_data(data):
     print("\nRecords")
-    # full output
-    if len(data) <= 10:
-        for record in data:
-            print(record["email_address"])
-    # shortened output
+    if data.shape[0] <= 10:
+        print(data)
     else:
-        for record in data[:5]:
-            print(record["email_address"])
-        # vertical ellipsis
-        for i in range(3):
-            print(".")
-        for record in data[-5:]:
-            print(record["email_address"])
+        print(data.head(10))
 
-    print(f"\n{len(data)} total recipients")
+    print(f"\n{data.shape[1]} total variables")
+    print(f"{data.shape[0]} total records")
 
 
 def peek_vars(data):
