@@ -6,19 +6,17 @@ import pandas as pd
 
 
 def get_recipients():
-    manual = prompt_entry_type()
-
     data_import = None
-    email_var = None
+
+    manual = prompt_entry_type()
 
     if not manual:
         data_import = load_data()
-        email_var = prompt_email_field(data_import)
 
     return {
-        "primary": collect_group("Primary", manual, data_import, email_var),
-        "cc": collect_group("Cc", manual, data_import, email_var),
-        "bcc": collect_group("Bcc", manual, data_import, email_var),
+        "primary": collect_group("Primary", manual, data_import),
+        "cc": collect_group("Cc", manual, data_import),
+        "bcc": collect_group("Bcc", manual, data_import),
     }
 
 
@@ -33,18 +31,29 @@ def prompt_entry_type():
             pass
 
 
-def prompt_email_field(data):
+def prompt_filter(data):
+    email_var = filter_var = filter_val = None
     peek_vars(data)
-    return input("Select an [address] variable: ").strip()
+    email_var = input("\nSelect an [email address] variable: ").strip()
+    if not email_var:
+        return email_var, filter_var, filter_val
+    filter_var = input("\nSelect a [filter] variable: ").strip()
+    filter_values = list(data[filter_var].unique())
+    print(f"Unique values in [{filter_var}]:")
+    for val in filter_values:
+        print(val)
+    filter_val = input("\nSelect a [filter] value: ").strip()
+    return email_var, filter_var, filter_val
 
 
-def collect_group(label, manual, data_import, email_var):
+def collect_group(label, manual, data_import):
     print(f"\n[{label}] recipients")
 
     if manual:
         return prompt_manual_emails()
     else:
-        return extract_emails(data_import, email_var)
+        email_var, filter_var, filter_val = prompt_filter(data_import)
+        return extract_emails(data_import, email_var, filter_var, filter_val)
 
 
 # data layer
@@ -63,8 +72,13 @@ def prompt_manual_emails():
     return emails
 
 
-def extract_emails(data_import, email_var):
-    return [record[email_var] for record in data_import]
+def extract_emails(data_import, email_var, filter_var, filter_val):
+    emails = []
+    if email_var:
+        # filter dataframe for inteded category
+        filtered_data = data_import[data_import[filter_var] == filter_val]
+        emails = list(filtered_data[email_var])
+    return emails
 
 
 def peek_data(data):
